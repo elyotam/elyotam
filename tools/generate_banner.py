@@ -16,7 +16,7 @@ LIGHT = "#4B8BBE"
 YELLOW = "#FFD43B"
 PALE = "#FFE873"
 COL_W = 20
-SUBTITLE = "Websites · Apps · AI Automation & Solutions"
+SUBTITLE = ""          # empty = the nameplate shows the name alone
 PLATE_W = 684          # inner width of the nameplate
 SUBTITLE_PAD = 60      # breathing room inside the plate
 GLYPH_H = 18
@@ -47,9 +47,9 @@ def rain():
     return "".join(out)
 
 
-def blips(count=16):
+def blips(count=16, y=196):
     return "".join(
-        f'<rect class="blip" x="{388 + i * 27}" y="196" width="21" height="14" '
+        f'<rect class="blip" x="{388 + i * 27}" y="{y}" width="21" height="14" '
         f'rx="2" fill="{YELLOW}" style="animation-delay:{i * 0.12:.2f}s"/>'
         for i in range(count)
     )
@@ -71,8 +71,22 @@ def build():
     # The subtitle is user-facing copy and may contain & or <, which have to be
     # escaped or the SVG stops being well-formed XML and silently fails to load.
     travel = GLYPH_H * GLYPHS_PER_COL
-    sub_size = fit_subtitle(SUBTITLE, PLATE_W - SUBTITLE_PAD * 2)
-    sub_track = 3
+
+    # With no subtitle the plate closes up around the name rather than leaving
+    # a hole where the strapline used to sit.
+    if SUBTITLE:
+        plate_y, plate_h, name_y, name_size, bar_y = 62, 176, 170, 52, 190
+        # Copy may contain & or <, which must be escaped or the SVG stops being
+        # well-formed XML and silently fails to load at all.
+        sub_size = fit_subtitle(SUBTITLE, PLATE_W - SUBTITLE_PAD * 2)
+        subtitle = (
+            f'<text x="600" y="107" text-anchor="middle" '
+            f'font-size="{{sub_size:.1f}}" fill="{{LIGHT}}" letter-spacing="3">'
+            f"{{escape(SUBTITLE)}}</text>"
+        )
+    else:
+        plate_y, plate_h, name_y, name_size, bar_y = 82, 136, 148, 56, 170
+        subtitle = ""
     return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" \
 viewBox="0 0 {W} {H}" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">
 <defs>
@@ -104,18 +118,17 @@ viewBox="0 0 {W} {H}" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,mo
 </defs>
 <rect width="{W}" height="{H}" fill="url(#bg)"/>
 <g mask="url(#fademask)">{rain()}</g>
-<rect x="258" y="62" width="684" height="176" rx="16" fill="#0d1117" opacity="0.85"/>
-<rect x="258" y="62" width="684" height="176" rx="16" fill="none" stroke="{PALE}"
+<rect x="258" y="{plate_y}" width="{PLATE_W}" height="{plate_h}" rx="16" fill="#0d1117" opacity="0.85"/>
+<rect x="258" y="{plate_y}" width="{PLATE_W}" height="{plate_h}" rx="16" fill="none" stroke="{PALE}"
       stroke-width="2" opacity="0.9" filter="url(#glow)"/>
-<text x="600" y="107" text-anchor="middle" font-size="{sub_size:.1f}" fill="{LIGHT}"
-      letter-spacing="{sub_track}">{escape(SUBTITLE)}</text>
-<text x="600" y="170" text-anchor="middle" font-size="52" font-weight="700">
+{subtitle}
+<text x="600" y="{name_y}" text-anchor="middle" font-size="{name_size}" font-weight="700">
   <tspan fill="{YELLOW}">\\</tspan><tspan fill="#e6edf3">Elyotam</tspan>\
 <tspan fill="{LIGHT}">Cohen</tspan><tspan fill="{YELLOW}">\\</tspan>
 </text>
-<rect x="380" y="190" width="440" height="26" rx="5" fill="none" stroke="{YELLOW}"
+<rect x="380" y="{bar_y}" width="440" height="26" rx="5" fill="none" stroke="{YELLOW}"
       stroke-width="2" opacity="0.85"/>
-{blips()}
+{blips(y=bar_y + 6)}
 </svg>"""
 
 

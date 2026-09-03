@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/banner.svg" alt="Elyotam Cohen — Websites, Apps, AI Automation and Solutions" width="100%">
+  <img src="assets/banner.svg" alt="Elyotam Cohen" width="100%">
 </p>
 
 <h1 align="center">Hi, I'm Elyotam Cohen! 👋</h1>
