@@ -9,11 +9,11 @@
 
 <p align="center">
   <a href="https://skillicons.dev">
-    <img src="https://skillicons.dev/icons?i=aws,azure,gcp,linux,bash,py,docker,kubernetes,terraform,ansible&perline=10" alt="Cloud, Linux and containers" />
+    <img src="https://skillicons.dev/icons?i=aws,azure,gcp,linux,docker,kubernetes,terraform,ansible,nginx&perline=9" alt="Cloud, Linux, containers and IaC" />
   </a>
   <br>
   <a href="https://skillicons.dev">
-    <img src="https://skillicons.dev/icons?i=jenkins,githubactions,git,github,postgres,prometheus,grafana,nginx,vscode&perline=9" alt="CI/CD, data and observability" />
+    <img src="https://skillicons.dev/icons?i=git,github,githubactions,gitlab,jenkins,bash,py,prometheus,grafana&perline=9" alt="Source control, CI/CD, scripting and observability" />
   </a>
 </p>
 
@@ -27,5 +27,7 @@
 </p>
 
 <p align="center">
-  <sub>One segment longer for every square it swallows — yellow on blue, because Python.</sub>
+  <sub>Yellow on blue, because Python. One segment longer for every few squares it swallows.</sub>
+  <br>
+  <sub><i>A decorative board, not my contribution graph.</i></sub>
 </p>

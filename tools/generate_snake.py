@@ -13,6 +13,7 @@ Usage:
 
 import json
 import os
+import random
 import sys
 import urllib.request
 
@@ -26,6 +27,13 @@ LEAD_IN = 14       # off-screen cells the snake slides in from
 RUN_OFF = 16       # off-screen cells it exits through
 START_LEN = 4      # segments before it has eaten anything
 STEP_MS = 50       # time per cell
+
+# A full board would make a +1-per-square snake longer than the grid itself,
+# which reads as a yellow blob rather than a snake. Growing once every few
+# meals keeps it dramatic and still legible.
+GROW_EVERY = 4
+DENSITY = 0.38     # share of squares filled on the decorative board
+BOARD_SEED = 20260904
 
 RADIUS = 3
 EPS = 0.01        # keyframe percentages must never collide
@@ -96,6 +104,26 @@ def fetch_calendar(login, token):
     return payload["data"]["user"]["contributionsCollection"]["contributionCalendar"]
 
 
+def decorative_grid(cols):
+    """A hand-tuned board for when the real graph is too sparse to play on.
+
+    Deliberately not the contribution calendar: weekends stay quieter and
+    filled cells cluster, so it reads like a board rather than static noise.
+    """
+    rng = random.Random(BOARD_SEED)
+    grid = {(c, r): 0 for c in range(cols) for r in range(ROWS)}
+    for col in range(cols):
+        for row in range(ROWS):
+            weight = DENSITY * (0.45 if row in (0, 6) else 1.0)
+            neighbours = sum(
+                1 for d in (-1, 1)
+                if grid.get((col + d, row), 0) > 0 or grid.get((col, row + d), 0) > 0
+            )
+            if rng.random() < weight + neighbours * 0.12:
+                grid[(col, row)] = rng.choice([1, 2, 3, 5, 8, 12, 18, 26])
+    return grid
+
+
 def build_grid(calendar):
     """Return {(col, row): count} plus the column count."""
     grid = {}
@@ -147,7 +175,8 @@ def render(grid, cols, theme_name):
         if grid.get(cell, 0) > 0 and cell not in eaten_at:
             eaten_at[cell] = step
     eat_steps = sorted(eaten_at.values())
-    max_len = START_LEN + len(eat_steps)
+    growth_steps = eat_steps[GROW_EVERY - 1::GROW_EVERY]
+    max_len = START_LEN + len(growth_steps)
 
     width = cols * PITCH - GAP
     height = ROWS * PITCH - GAP
@@ -204,7 +233,7 @@ def render(grid, cols, theme_name):
         if i >= START_LEN:
             # This segment only exists once the (i - START_LEN + 1)-th square
             # has been eaten, so the tail grows one cell at a time.
-            appear = eat_steps[i - START_LEN] / total * 100
+            appear = growth_steps[i - START_LEN] / total * 100
             grow = f"grow{i}"
             css.append(
                 f"@keyframes {grow}{{"
@@ -253,11 +282,14 @@ def main():
 
     calendar = fetch_calendar(login, token)
     grid, cols = build_grid(calendar)
-    filled = sum(1 for v in grid.values() if v > 0)
+    real_filled = sum(1 for v in grid.values() if v > 0)
     print(
         f"{login}: {calendar['totalContributions']} contributions, "
-        f"{filled} filled squares over {cols} weeks"
+        f"{real_filled} filled squares over {cols} weeks"
     )
+    if os.environ.get("SNAKE_BOARD", "full") == "full":
+        grid = decorative_grid(cols)
+        print(f"  decorative board: {sum(1 for v in grid.values() if v > 0)} squares")
 
     os.makedirs(out_dir, exist_ok=True)
     for theme in THEMES:
