@@ -8,13 +8,7 @@
 <h3 align="center">🛠️ Languages and Tools</h3>
 
 <p align="center">
-  <a href="https://skillicons.dev">
-    <img src="https://skillicons.dev/icons?i=aws,azure,gcp,linux,docker,kubernetes,terraform,ansible,nginx&perline=9" alt="Cloud, Linux, containers and IaC" />
-  </a>
-  <br>
-  <a href="https://skillicons.dev">
-    <img src="https://skillicons.dev/icons?i=git,github,githubactions,gitlab,jenkins,bash,py,prometheus,grafana&perline=9" alt="Source control, CI/CD, scripting and observability" />
-  </a>
+  <img src="assets/tools.svg" alt="Linux, Bash, Python, Docker, Kubernetes, Helm, ArgoCD, Terraform, Ansible, AWS, Git, GitHub, GitHub Actions, NGINX, PostgreSQL, Prometheus, Grafana" width="620">
 </p>
 
 <h3 align="center">🐍 Feeding the snake</h3>
