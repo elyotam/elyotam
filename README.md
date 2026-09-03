@@ -35,12 +35,10 @@
   <img src="assets/icons/antigravity.svg" title="Google Antigravity" alt="Google Antigravity" width="48" height="48">
 </p>
 
-<h3 align="center">🐍 Feeding the snake</h3>
-
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="assets/snake-dark.svg">
-    <img alt="A yellow snake eating the letters of my name, growing as it goes" src="assets/snake-light.svg" width="100%">
+    <img alt="A blue snake eating the letters of my name, growing as it goes" src="assets/snake-light.svg" width="100%">
   </picture>
 </p>
 
