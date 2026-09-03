@@ -8,6 +8,7 @@ Usage:  python generate_banner.py <out-dir>
 import os
 import random
 import sys
+from xml.sax.saxutils import escape
 
 W, H = 1200, 300
 BLUE = "#3776AB"
@@ -15,6 +16,9 @@ LIGHT = "#4B8BBE"
 YELLOW = "#FFD43B"
 PALE = "#FFE873"
 COL_W = 20
+SUBTITLE = "Websites · Apps · AI Automation & Solutions"
+PLATE_W = 684          # inner width of the nameplate
+SUBTITLE_PAD = 60      # breathing room inside the plate
 GLYPH_H = 18
 GLYPHS_PER_COL = 34
 SEED = 20260904
@@ -51,8 +55,24 @@ def blips(count=16):
     )
 
 
+def fit_subtitle(text, max_width, tracking=3, cap=20):
+    """Largest font size at which `text` still fits the nameplate.
+
+    The face is monospace, so an advance of ~0.6em per character plus the
+    tracking is an accurate enough estimate to size against.
+    """
+    # 0.55em measured against the rendered face, not the 0.6em rule of thumb.
+    per_char = 0.55
+    size = (max_width / len(text) - tracking) / per_char
+    return min(cap, max(11, size))
+
+
 def build():
+    # The subtitle is user-facing copy and may contain & or <, which have to be
+    # escaped or the SVG stops being well-formed XML and silently fails to load.
     travel = GLYPH_H * GLYPHS_PER_COL
+    sub_size = fit_subtitle(SUBTITLE, PLATE_W - SUBTITLE_PAD * 2)
+    sub_track = 3
     return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" \
 viewBox="0 0 {W} {H}" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">
 <defs>
@@ -87,8 +107,8 @@ viewBox="0 0 {W} {H}" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,mo
 <rect x="258" y="62" width="684" height="176" rx="16" fill="#0d1117" opacity="0.85"/>
 <rect x="258" y="62" width="684" height="176" rx="16" fill="none" stroke="{PALE}"
       stroke-width="2" opacity="0.9" filter="url(#glow)"/>
-<text x="600" y="107" text-anchor="middle" font-size="20" fill="{LIGHT}"
-      letter-spacing="4">DevOps &#183; Cloud &#183; Automation</text>
+<text x="600" y="107" text-anchor="middle" font-size="{sub_size:.1f}" fill="{LIGHT}"
+      letter-spacing="{sub_track}">{escape(SUBTITLE)}</text>
 <text x="600" y="170" text-anchor="middle" font-size="52" font-weight="700">
   <tspan fill="{YELLOW}">\\</tspan><tspan fill="#e6edf3">Elyotam</tspan>\
 <tspan fill="{LIGHT}">Cohen</tspan><tspan fill="{YELLOW}">\\</tspan>

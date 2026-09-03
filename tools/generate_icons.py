@@ -20,11 +20,12 @@ GAP = PITCH - TILE
 RADIUS = 60
 
 ROWS = [
-    ["linux", "bash", "py", "docker", "kubernetes", "helm", "argocd",
-     "terraform"],
-    ["ansible", "aws", "git", "github", "githubactions", "postgres",
-     "prometheus", "grafana"],
-    ["vscode", "cursor", "claudecode", "codex", "antigravity"],
+    ["linux", "windows", "windowsserver", "activedirectory", "grouppolicy",
+     "bash", "py", "git", "github"],
+    ["docker", "kubernetes", "helm", "argocd", "terraform", "ansible", "aws",
+     "githubactions"],
+    ["postgres", "prometheus", "grafana", "vscode", "cursor", "claudecode",
+     "codex", "antigravity"],
 ]
 
 # Hover labels. Each icon ships as its own file so the README can hang a
@@ -37,6 +38,8 @@ LABELS = {
     "git": "Git", "github": "GitHub", "githubactions": "GitHub Actions",
     "postgres": "PostgreSQL", "prometheus": "Prometheus",
     "grafana": "Grafana", "vscode": "VS Code", "cursor": "Cursor",
+    "windows": "Windows", "windowsserver": "Windows Server",
+    "activedirectory": "Active Directory", "grouppolicy": "Group Policy",
     "claudecode": "Claude Code", "codex": "Codex",
     "antigravity": "Google Antigravity",
 }
@@ -152,6 +155,62 @@ def custom_tile(name):
     )
 
 
+# Microsoft publishes no freely reusable mark for these three, and its own icon
+# set is licensed for architecture diagrams only. So they are drawn here as
+# plain symbols in the same 256/rx-60 tile format: a rack, a directory tree and
+# a policy shield. They are descriptive glyphs, not brand logos.
+def _tile(bg, body):
+    return (
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{TILE}" '
+        f'height="{TILE}" viewBox="0 0 {TILE} {TILE}">'
+        f'<rect width="{TILE}" height="{TILE}" rx="{RADIUS}" fill="{bg}"/>'
+        f"{body}</svg>"
+    )
+
+
+def _server_rack(bg="#0078D4"):
+    bars = ""
+    for y in (42, 106, 170):
+        bars += (
+            f'<rect x="56" y="{y}" width="144" height="44" rx="10" fill="#fff"/>'
+            f'<circle cx="82" cy="{y + 22}" r="9" fill="{bg}"/>'
+            f'<rect x="140" y="{y + 18}" width="44" height="8" rx="4" fill="{bg}"/>'
+        )
+    return _tile(bg, bars)
+
+
+def _directory_tree(bg="#2B5797"):
+    body = (
+        '<circle cx="128" cy="52" r="24" fill="#fff"/>'
+        '<rect x="123" y="74" width="10" height="38" fill="#fff"/>'
+        '<rect x="48" y="106" width="160" height="10" rx="5" fill="#fff"/>'
+        '<rect x="48" y="106" width="10" height="34" fill="#fff"/>'
+        '<rect x="123" y="106" width="10" height="34" fill="#fff"/>'
+        '<rect x="198" y="106" width="10" height="34" fill="#fff"/>'
+        '<circle cx="53" cy="164" r="22" fill="#fff"/>'
+        '<circle cx="128" cy="164" r="22" fill="#fff"/>'
+        '<circle cx="203" cy="164" r="22" fill="#fff"/>'
+    )
+    return _tile(bg, body)
+
+
+def _policy_shield(bg="#2D7D9A"):
+    body = (
+        '<path fill="#fff" d="M128 30 214 66v62c0 52-38 82-86 98'
+        '-48-16-86-46-86-98V66Z"/>'
+        f'<path fill="none" stroke="{bg}" stroke-width="20" stroke-linecap="round" '
+        'stroke-linejoin="round" d="M92 130l26 28 52-56"/>'
+    )
+    return _tile(bg, body)
+
+
+LOCAL_TILES = {
+    "windowsserver": _server_rack,
+    "activedirectory": _directory_tree,
+    "grouppolicy": _policy_shield,
+}
+
+
 def build():
     width = max(len(r) for r in ROWS) * PITCH - GAP
     height = len(ROWS) * TILE + GAP * (len(ROWS) - 1)
@@ -187,7 +246,10 @@ def main():
     custom, markup = [], []
     for row in ROWS:
         for name in row:
-            if name in CNCF:
+            if name in LOCAL_TILES:
+                tile = LOCAL_TILES[name]()
+                custom.append(name)
+            elif name in SOURCES:
                 tile = custom_tile(name)
                 custom.append(name)
             else:
