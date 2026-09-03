@@ -25,6 +25,18 @@ ROWS = [
      "prometheus", "grafana"],
 ]
 
+# Hover labels. Each icon ships as its own file so the README can hang a
+# `title` on every one; a single combined strip loaded as <img> cannot show
+# per-icon tooltips, because an <img> never passes pointer events into the SVG.
+LABELS = {
+    "linux": "Linux", "bash": "Bash", "py": "Python", "docker": "Docker",
+    "kubernetes": "Kubernetes", "helm": "Helm", "argocd": "Argo CD",
+    "terraform": "Terraform", "ansible": "Ansible", "aws": "AWS",
+    "git": "Git", "github": "GitHub", "githubactions": "GitHub Actions",
+    "nginx": "NGINX", "postgres": "PostgreSQL", "prometheus": "Prometheus",
+    "grafana": "Grafana",
+}
+
 CNCF = {
     "helm": "https://raw.githubusercontent.com/cncf/artwork/main/projects/helm/icon/color/helm-icon-color.svg",
     "argocd": "https://raw.githubusercontent.com/cncf/artwork/main/projects/argo/icon/color/argo-icon-color.svg",
@@ -117,14 +129,36 @@ def build():
 
 def main():
     out_dir = sys.argv[1] if len(sys.argv) > 1 else "."
-    os.makedirs(out_dir, exist_ok=True)
-    svg, custom = build()
-    path = os.path.join(out_dir, "tools.svg")
-    with open(path, "w", encoding="utf-8") as fh:
-        fh.write(svg)
+    icon_dir = os.path.join(out_dir, "icons")
+    os.makedirs(icon_dir, exist_ok=True)
+
+    custom, markup = [], []
+    for row in ROWS:
+        for name in row:
+            if name in CNCF:
+                tile = custom_tile(name)
+                custom.append(name)
+            else:
+                tile = skillicon_tile(name)
+            with open(os.path.join(icon_dir, f"{name}.svg"), "w",
+                      encoding="utf-8") as fh:
+                fh.write(tile)
+            label = LABELS[name]
+            markup.append(
+                f'  <img src="assets/icons/{name}.svg" title="{label}" '
+                f'alt="{label}" width="48" height="48">'
+            )
+        markup.append("  <br>")
+    markup.pop()  # no trailing break
+
+    snippet = os.path.join(out_dir, "icons-snippet.html")
+    with open(snippet, "w", encoding="utf-8") as fh:
+        fh.write("\n".join(markup) + "\n")
+
     total = sum(len(r) for r in ROWS)
-    print(f"wrote {path} ({len(svg) / 1024:.1f} KB)")
-    print(f"  {total} icons; hand-built tiles: {', '.join(custom)}")
+    print(f"wrote {total} tiles to {icon_dir}")
+    print(f"  hand-built: {', '.join(custom)}")
+    print(f"  README snippet: {snippet}")
 
 
 if __name__ == "__main__":
