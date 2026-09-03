@@ -20,12 +20,14 @@ GAP = PITCH - TILE
 RADIUS = 60
 
 ROWS = [
-    ["linux", "windows", "fortinet", "jumpcloud", "ninite", "bash", "py",
-     "git", "github", "githubactions"],
-    ["docker", "kubernetes", "helm", "argocd", "terraform", "ansible", "aws",
-     "postgres", "prometheus", "grafana"],
-    ["microsoft365", "googleworkspace", "salesforce", "voicenter", "vscode",
-     "cursor", "claudecode", "codex", "antigravity"],
+    ["linux", "windows", "fortinet", "falcon", "openvpn", "jumpcloud",
+     "ninite", "bash", "py"],
+    ["git", "github", "githubactions", "npm", "docker", "kubernetes", "helm",
+     "argocd", "terraform"],
+    ["ansible", "aws", "postgres", "prometheus", "grafana", "microsoft365",
+     "googleworkspace", "salesforce"],
+    ["voicenter", "slack", "figma", "vscode", "cursor", "claudecode", "codex",
+     "antigravity"],
 ]
 
 # Marks that needed manual preparation (cropped out of a wordmark, or the only
@@ -46,7 +48,8 @@ LABELS = {
     "windows": "Windows", "fortinet": "Fortinet", "jumpcloud": "JumpCloud",
     "ninite": "Ninite", "microsoft365": "Microsoft 365",
     "googleworkspace": "Google Workspace", "salesforce": "Salesforce",
-    "voicenter": "Voicenter",
+    "voicenter": "Voicenter", "falcon": "CrowdStrike Falcon",
+    "openvpn": "OpenVPN", "slack": "Slack", "figma": "Figma", "npm": "npm",
     "claudecode": "Claude Code", "codex": "Codex",
     "antigravity": "Google Antigravity",
 }
@@ -64,6 +67,9 @@ SOURCES = {
     "jumpcloud": "brand-assets/jumpcloud.png",
     "voicenter": "brand-assets/voicenter.png",
     "ninite": "brand-assets/ninite.png",
+    "falcon": "brand-assets/falcon.svg",
+    "slack": "brand-assets/slack.svg",
+    "openvpn": "brand-assets/openvpn.svg",
     "codex": "https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg",
     # Google ships no SVG for Antigravity; its touch icon is the only official
     # mark available, so it gets embedded as a bitmap.
@@ -86,6 +92,9 @@ CUSTOM_STYLE = {
     "jumpcloud": {"bg": "#FFFFFF", "recolor": None, "scale": 1.0, "bitmap": True},
     "voicenter": {"bg": "#18181B", "recolor": None, "scale": 1.0, "bitmap": True},
     "ninite": {"bg": "#FFFFFF", "recolor": None, "scale": 1.0, "bitmap": True},
+    "falcon": {"bg": "#0D0D0D", "recolor": None, "scale": 0.72},
+    "slack": {"bg": "#FFFFFF", "recolor": None, "scale": 0.62},
+    "openvpn": {"bg": "#EA7E20", "recolor": "#FFFFFF", "scale": 0.62},
     "codex": {"bg": "#74AA9C", "recolor": None, "scale": 1.0},
     "antigravity": {"bg": "#FFFFFF", "recolor": None, "scale": 1.0,
                     "bitmap": True},
@@ -119,10 +128,20 @@ def skillicon_tile(name):
 
 
 def viewbox(svg):
-    m = re.search(r'viewBox="([\d.\-\s]+)"', svg)
-    if not m:
-        raise SystemExit("logo has no viewBox")
-    return [float(v) for v in m.group(1).split()]
+    """Intrinsic box of a logo: viewBox if present, else width/height.
+
+    Some archive exports size themselves with width/height attributes only,
+    which is still enough to scale the mark into a tile.
+    """
+    m = re.search('viewBox="([0-9. -]+)"', svg)
+    if m:
+        return [float(v) for v in m.group(1).split()]
+    # The lookbehind keeps stroke-width from being mistaken for width.
+    w = re.search('(?<![-a-z])width="([0-9.]+)"', svg)
+    h = re.search('(?<![-a-z])height="([0-9.]+)"', svg)
+    if w and h:
+        return [0.0, 0.0, float(w.group(1)), float(h.group(1))]
+    raise SystemExit("logo has neither viewBox nor width/height")
 
 
 def get_bytes(url):
@@ -171,7 +190,12 @@ def custom_tile(name):
     # simple-icons declares its colour on the root <svg>, which gets stripped
     # here - so the recolour is applied on the wrapping group as well, and any
     # explicit fills inside are rewritten so they cannot override it.
-    group_fill = ""
+    # A fill declared on the root <svg> would be lost with the tag we strip,
+    # leaving the mark to inherit black. Carry it across instead.
+    root = re.match(r"(?s).*?<svg[^>]*>", logo)
+    root_fill = re.search(r'fill="(#[0-9A-Fa-f]{3,6})"', root.group(0)) if root else None
+
+    group_fill = f'fill="{root_fill.group(1)}" ' if root_fill else ""
     if style["recolor"]:
         body = re.sub(r'fill:\s*#[0-9A-Fa-f]{3,6}', f'fill:{style["recolor"]}', body)
         body = re.sub(r'fill="#[0-9A-Fa-f]{3,6}"', f'fill="{style["recolor"]}"', body)
