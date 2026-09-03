@@ -22,12 +22,12 @@
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="assets/snake-dark.svg">
-    <img alt="A yellow snake eating my contribution squares, growing with every bite" src="assets/snake-light.svg" width="100%">
+    <img alt="A yellow snake eating the letters of my name, growing as it goes" src="assets/snake-light.svg" width="100%">
   </picture>
 </p>
 
 <p align="center">
-  <sub>Yellow on blue, because Python. One segment longer for every few squares it swallows.</sub>
+  <sub>It eats my name and grows a segment fatter every few bites.</sub>
   <br>
-  <sub><i>A decorative board, not my contribution graph.</i></sub>
+  <sub><i>Yellow on blue, because Python.</i></sub>
 </p>

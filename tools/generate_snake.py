@@ -31,9 +31,27 @@ STEP_MS = 50       # time per cell
 # A full board would make a +1-per-square snake longer than the grid itself,
 # which reads as a yellow blob rather than a snake. Growing once every few
 # meals keeps it dramatic and still legible.
-GROW_EVERY = 4
+GROW_EVERY = 3
 DENSITY = 0.38     # share of squares filled on the decorative board
 BOARD_SEED = 20260904
+BOARD_TEXT = "ELYOTAM COHEN"
+
+# A 5-row pixel font. Most glyphs are three columns wide; M and N get more
+# because they are unreadable any narrower. "ELYOTAM COHEN" comes to 52 of the
+# board's 53 columns, which is the whole reason the letters are this cramped.
+FONT = {
+    "A": ["010", "101", "111", "101", "101"],
+    "C": ["111", "100", "100", "100", "111"],
+    "E": ["111", "100", "110", "100", "111"],
+    "H": ["101", "101", "111", "101", "101"],
+    "L": ["100", "100", "100", "100", "111"],
+    "M": ["10001", "11011", "10101", "10001", "10001"],
+    "N": ["1001", "1101", "1011", "1001", "1001"],
+    "O": ["111", "101", "101", "101", "111"],
+    "T": ["111", "010", "010", "010", "010"],
+    "Y": ["101", "101", "010", "010", "010"],
+    " ": ["0"] * 5,
+}
 
 RADIUS = 3
 EPS = 0.01        # keyframe percentages must never collide
@@ -102,6 +120,29 @@ def fetch_calendar(login, token):
     if "errors" in payload:
         raise SystemExit(f"GraphQL error: {payload['errors']}")
     return payload["data"]["user"]["contributionsCollection"]["contributionCalendar"]
+
+
+def text_grid(cols, text=BOARD_TEXT):
+    """Spell `text` out in squares, centred on the board.
+
+    Glyphs are five rows tall, leaving one blank row above and below.
+    """
+    glyphs = [FONT[ch] for ch in text.upper()]
+    width = sum(len(g[0]) for g in glyphs) + len(glyphs) - 1
+    if width > cols:
+        raise SystemExit(f"{text!r} needs {width} columns, board is {cols}")
+
+    grid = {(c, r): 0 for c in range(cols) for r in range(ROWS)}
+    col = (cols - width) // 2
+    top = (ROWS - 5) // 2
+    for glyph in glyphs:
+        for r, line in enumerate(glyph):
+            for dc, bit in enumerate(line):
+                if bit == "1":
+                    # Brightest level, so the lettering stays legible.
+                    grid[(col + dc, top + r)] = 26
+        col += len(glyph[0]) + 1
+    return grid
 
 
 def decorative_grid(cols):
@@ -287,7 +328,12 @@ def main():
         f"{login}: {calendar['totalContributions']} contributions, "
         f"{real_filled} filled squares over {cols} weeks"
     )
-    if os.environ.get("SNAKE_BOARD", "full") == "full":
+    board = os.environ.get("SNAKE_BOARD", "text")
+    if board == "text":
+        grid = text_grid(cols)
+        print(f"  board spells {BOARD_TEXT!r}: "
+              f"{sum(1 for v in grid.values() if v > 0)} squares")
+    elif board == "full":
         grid = decorative_grid(cols)
         print(f"  decorative board: {sum(1 for v in grid.values() if v > 0)} squares")
 
