@@ -4,7 +4,7 @@
 
 <img align="right" src="https://visitor-badge.laobi.icu/badge?page_id=elyotam_profile_visits&left_color=%233776AB&right_color=%23FFD43B" alt="visitors" />
 
-<h3 align="center">🛠️ Languages and Tools</h3>
+<h3 align="center">🛠️ Tech Stack</h3>
 
 <p align="center">
   <img src="assets/icons/linux.svg" title="Linux" alt="Linux" width="48" height="48">
