@@ -16,8 +16,8 @@
   <img src="assets/icons/helm.svg" title="Helm" alt="Helm" width="48" height="48">
   <img src="assets/icons/argocd.svg" title="Argo CD" alt="Argo CD" width="48" height="48">
   <img src="assets/icons/terraform.svg" title="Terraform" alt="Terraform" width="48" height="48">
-  <img src="assets/icons/ansible.svg" title="Ansible" alt="Ansible" width="48" height="48">
   <br>
+  <img src="assets/icons/ansible.svg" title="Ansible" alt="Ansible" width="48" height="48">
   <img src="assets/icons/aws.svg" title="AWS" alt="AWS" width="48" height="48">
   <img src="assets/icons/git.svg" title="Git" alt="Git" width="48" height="48">
   <img src="assets/icons/github.svg" title="GitHub" alt="GitHub" width="48" height="48">
@@ -25,7 +25,12 @@
   <img src="assets/icons/postgres.svg" title="PostgreSQL" alt="PostgreSQL" width="48" height="48">
   <img src="assets/icons/prometheus.svg" title="Prometheus" alt="Prometheus" width="48" height="48">
   <img src="assets/icons/grafana.svg" title="Grafana" alt="Grafana" width="48" height="48">
+  <br>
   <img src="assets/icons/vscode.svg" title="VS Code" alt="VS Code" width="48" height="48">
+  <img src="assets/icons/cursor.svg" title="Cursor" alt="Cursor" width="48" height="48">
+  <img src="assets/icons/claudecode.svg" title="Claude Code" alt="Claude Code" width="48" height="48">
+  <img src="assets/icons/codex.svg" title="Codex" alt="Codex" width="48" height="48">
+  <img src="assets/icons/antigravity.svg" title="Google Antigravity" alt="Google Antigravity" width="48" height="48">
 </p>
 
 <h3 align="center">🐍 Feeding the snake</h3>

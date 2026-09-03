@@ -8,6 +8,7 @@ from the official CNCF artwork in the same 256x256 / rx=60 format.
 Usage:  python generate_icons.py <out-dir>
 """
 
+import base64
 import os
 import re
 import sys
@@ -20,9 +21,10 @@ RADIUS = 60
 
 ROWS = [
     ["linux", "bash", "py", "docker", "kubernetes", "helm", "argocd",
-     "terraform", "ansible"],
-    ["aws", "git", "github", "githubactions", "postgres", "prometheus",
-     "grafana", "vscode"],
+     "terraform"],
+    ["ansible", "aws", "git", "github", "githubactions", "postgres",
+     "prometheus", "grafana"],
+    ["vscode", "cursor", "claudecode", "codex", "antigravity"],
 ]
 
 # Hover labels. Each icon ships as its own file so the README can hang a
@@ -34,13 +36,23 @@ LABELS = {
     "terraform": "Terraform", "ansible": "Ansible", "aws": "AWS",
     "git": "Git", "github": "GitHub", "githubactions": "GitHub Actions",
     "postgres": "PostgreSQL", "prometheus": "Prometheus",
-    "grafana": "Grafana", "vscode": "VS Code",
+    "grafana": "Grafana", "vscode": "VS Code", "cursor": "Cursor",
+    "claudecode": "Claude Code", "codex": "Codex",
+    "antigravity": "Google Antigravity",
 }
 
-CNCF = {
+# Tiles skillicons does not carry, built here from official marks.
+SOURCES = {
     "helm": "https://raw.githubusercontent.com/cncf/artwork/main/projects/helm/icon/color/helm-icon-color.svg",
     "argocd": "https://raw.githubusercontent.com/cncf/artwork/main/projects/argo/icon/color/argo-icon-color.svg",
+    "claudecode": "https://cdn.simpleicons.org/claude",
+    "cursor": "https://cdn.simpleicons.org/cursor",
+    "codex": "https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg",
+    # Google ships no SVG for Antigravity; its touch icon is the only official
+    # mark available, so it gets embedded as a bitmap.
+    "antigravity": "https://antigravity.google/apple-touch-icon.png",
 }
+CNCF = SOURCES  # kept for the existing lookups
 
 # Backgrounds chosen for contrast: Helm's mark is a single navy colour so it is
 # flipped to white on brand navy; Argo's octopus keeps its own palette and sits
@@ -48,6 +60,11 @@ CNCF = {
 CUSTOM_STYLE = {
     "helm": {"bg": "#0F1689", "recolor": "#FFFFFF", "scale": 0.62},
     "argocd": {"bg": "#242938", "recolor": None, "scale": 0.80},
+    "claudecode": {"bg": "#D97757", "recolor": "#FFFFFF", "scale": 0.58},
+    "cursor": {"bg": "#18181B", "recolor": "#FFFFFF", "scale": 0.56},
+    "codex": {"bg": "#74AA9C", "recolor": None, "scale": 1.0},
+    "antigravity": {"bg": "#FFFFFF", "recolor": None, "scale": 1.0,
+                    "bitmap": True},
 }
 
 
@@ -74,16 +91,47 @@ def viewbox(svg):
     return [float(v) for v in m.group(1).split()]
 
 
+def get_bytes(url):
+    req = urllib.request.Request(url, headers={"User-Agent": "icon-strip"})
+    with urllib.request.urlopen(req) as resp:
+        return resp.read()
+
+
+def bitmap_tile(name):
+    """For marks that ship only as a raster image, embedded as a data URI."""
+    style = CUSTOM_STYLE[name]
+    data = base64.b64encode(get_bytes(SOURCES[name])).decode("ascii")
+    return (
+        f'<svg xmlns="http://www.w3.org/2000/svg" '
+        f'xmlns:xlink="http://www.w3.org/1999/xlink" '
+        f'width="{TILE}" height="{TILE}" viewBox="0 0 {TILE} {TILE}">'
+        f'<defs><clipPath id="r"><rect width="{TILE}" height="{TILE}" '
+        f'rx="{RADIUS}"/></clipPath></defs>'
+        f'<g clip-path="url(#r)">'
+        f'<rect width="{TILE}" height="{TILE}" fill="{style["bg"]}"/>'
+        f'<image href="data:image/png;base64,{data}" width="{TILE}" '
+        f'height="{TILE}" preserveAspectRatio="xMidYMid meet"/>'
+        f"</g></svg>"
+    )
+
+
 def custom_tile(name):
     style = CUSTOM_STYLE[name]
-    logo = get(CNCF[name])
+    if style.get("bitmap"):
+        return bitmap_tile(name)
+    logo = get(SOURCES[name])
     _, _, vw, vh = viewbox(logo)
 
     body = re.sub(r"^.*?<svg[^>]*>", "", logo, flags=re.S)
     body = re.sub(r"</svg>\s*$", "", body, flags=re.S)
+    # simple-icons declares its colour on the root <svg>, which gets stripped
+    # here - so the recolour is applied on the wrapping group as well, and any
+    # explicit fills inside are rewritten so they cannot override it.
+    group_fill = ""
     if style["recolor"]:
         body = re.sub(r'fill:\s*#[0-9A-Fa-f]{3,6}', f'fill:{style["recolor"]}', body)
         body = re.sub(r'fill="#[0-9A-Fa-f]{3,6}"', f'fill="{style["recolor"]}"', body)
+        group_fill = f'fill="{style["recolor"]}" '
 
     # Fit the logo into the tile, centred, at the configured scale.
     span = TILE * style["scale"]
@@ -98,7 +146,8 @@ def custom_tile(name):
         f'xmlns:xlink="http://www.w3.org/1999/xlink" '
         f'width="{TILE}" height="{TILE}" viewBox="0 0 {TILE} {TILE}">'
         f'<rect width="{TILE}" height="{TILE}" rx="{RADIUS}" fill="{style["bg"]}"/>'
-        f'<g transform="translate({dx:.2f},{dy:.2f}) scale({k:.5f})">{body}</g>'
+        f'<g {group_fill}transform="translate({dx:.2f},{dy:.2f}) '
+        f'scale({k:.5f})">{body}</g>'
         f"</svg>"
     )
 
