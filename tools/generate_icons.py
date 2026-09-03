@@ -20,13 +20,18 @@ GAP = PITCH - TILE
 RADIUS = 60
 
 ROWS = [
-    ["linux", "windows", "fortinet", "bash", "py", "git", "github",
-     "githubactions"],
+    ["linux", "windows", "fortinet", "jumpcloud", "ninite", "bash", "py",
+     "git", "github", "githubactions"],
     ["docker", "kubernetes", "helm", "argocd", "terraform", "ansible", "aws",
-     "postgres"],
-    ["prometheus", "grafana", "vscode", "cursor", "claudecode", "codex",
-     "antigravity"],
+     "postgres", "prometheus", "grafana"],
+    ["microsoft365", "googleworkspace", "salesforce", "voicenter", "vscode",
+     "cursor", "claudecode", "codex", "antigravity"],
 ]
+
+# Marks that needed manual preparation (cropped out of a wordmark, or the only
+# square asset a vendor publishes) live in the repo next to this script.
+ASSET_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                         "brand-assets")
 
 # Hover labels. Each icon ships as its own file so the README can hang a
 # `title` on every one; a single combined strip loaded as <img> cannot show
@@ -38,7 +43,10 @@ LABELS = {
     "git": "Git", "github": "GitHub", "githubactions": "GitHub Actions",
     "postgres": "PostgreSQL", "prometheus": "Prometheus",
     "grafana": "Grafana", "vscode": "VS Code", "cursor": "Cursor",
-    "windows": "Windows", "fortinet": "Fortinet",
+    "windows": "Windows", "fortinet": "Fortinet", "jumpcloud": "JumpCloud",
+    "ninite": "Ninite", "microsoft365": "Microsoft 365",
+    "googleworkspace": "Google Workspace", "salesforce": "Salesforce",
+    "voicenter": "Voicenter",
     "claudecode": "Claude Code", "codex": "Codex",
     "antigravity": "Google Antigravity",
 }
@@ -50,6 +58,12 @@ SOURCES = {
     "claudecode": "https://cdn.simpleicons.org/claude",
     "cursor": "https://cdn.simpleicons.org/cursor",
     "fortinet": "https://cdn.simpleicons.org/fortinet",
+    "salesforce": "brand-assets/salesforce.svg",
+    "microsoft365": "brand-assets/microsoft365.svg",
+    "googleworkspace": "brand-assets/googleworkspace.svg",
+    "jumpcloud": "brand-assets/jumpcloud.png",
+    "voicenter": "brand-assets/voicenter.png",
+    "ninite": "brand-assets/ninite.png",
     "codex": "https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg",
     # Google ships no SVG for Antigravity; its touch icon is the only official
     # mark available, so it gets embedded as a bitmap.
@@ -66,13 +80,29 @@ CUSTOM_STYLE = {
     "claudecode": {"bg": "#D97757", "recolor": "#FFFFFF", "scale": 0.58},
     "cursor": {"bg": "#18181B", "recolor": "#FFFFFF", "scale": 0.56},
     "fortinet": {"bg": "#EE3124", "recolor": "#FFFFFF", "scale": 0.62},
+    "salesforce": {"bg": "#FFFFFF", "recolor": None, "scale": 0.80},
+    "microsoft365": {"bg": "#FFFFFF", "recolor": None, "scale": 0.70},
+    "googleworkspace": {"bg": "#FFFFFF", "recolor": None, "scale": 0.62},
+    "jumpcloud": {"bg": "#FFFFFF", "recolor": None, "scale": 1.0, "bitmap": True},
+    "voicenter": {"bg": "#18181B", "recolor": None, "scale": 1.0, "bitmap": True},
+    "ninite": {"bg": "#FFFFFF", "recolor": None, "scale": 1.0, "bitmap": True},
     "codex": {"bg": "#74AA9C", "recolor": None, "scale": 1.0},
     "antigravity": {"bg": "#FFFFFF", "recolor": None, "scale": 1.0,
                     "bitmap": True},
 }
 
 
+def _local(ref):
+    """SOURCES entries that are not URLs resolve inside brand-assets/."""
+    return None if ref.startswith("http") else os.path.join(
+        os.path.dirname(ASSET_DIR), ref)
+
+
 def get(url):
+    path = _local(url)
+    if path:
+        with open(path, encoding="utf-8") as fh:
+            return fh.read()
     req = urllib.request.Request(url, headers={"User-Agent": "icon-strip"})
     with urllib.request.urlopen(req) as resp:
         return resp.read().decode("utf-8")
@@ -96,6 +126,10 @@ def viewbox(svg):
 
 
 def get_bytes(url):
+    path = _local(url)
+    if path:
+        with open(path, "rb") as fh:
+            return fh.read()
     req = urllib.request.Request(url, headers={"User-Agent": "icon-strip"})
     with urllib.request.urlopen(req) as resp:
         return resp.read()
@@ -128,6 +162,12 @@ def custom_tile(name):
 
     body = re.sub(r"^.*?<svg[^>]*>", "", logo, flags=re.S)
     body = re.sub(r"</svg>\s*$", "", body, flags=re.S)
+    # Editor and archive exports carry <metadata> using rdf:/cc:/dc: prefixes
+    # that were declared on the root element we just removed. Nothing here
+    # renders, and leaving it makes the standalone tile invalid XML.
+    for tag in ("metadata", "title", "desc"):
+        body = re.sub(rf"<{tag}.*?</{tag}>", "", body, flags=re.S)
+    body = re.sub(r"<!--.*?-->", "", body, flags=re.S)
     # simple-icons declares its colour on the root <svg>, which gets stripped
     # here - so the recolour is applied on the wrapping group as well, and any
     # explicit fills inside are rewritten so they cannot override it.
