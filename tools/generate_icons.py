@@ -21,8 +21,8 @@ RADIUS = 60
 ROWS = [
     ["linux", "bash", "py", "docker", "kubernetes", "helm", "argocd",
      "terraform", "ansible"],
-    ["aws", "git", "github", "githubactions", "nginx", "postgres",
-     "prometheus", "grafana"],
+    ["aws", "git", "github", "githubactions", "postgres", "prometheus",
+     "grafana", "vscode"],
 ]
 
 # Hover labels. Each icon ships as its own file so the README can hang a
@@ -33,8 +33,8 @@ LABELS = {
     "kubernetes": "Kubernetes", "helm": "Helm", "argocd": "Argo CD",
     "terraform": "Terraform", "ansible": "Ansible", "aws": "AWS",
     "git": "Git", "github": "GitHub", "githubactions": "GitHub Actions",
-    "nginx": "NGINX", "postgres": "PostgreSQL", "prometheus": "Prometheus",
-    "grafana": "Grafana",
+    "postgres": "PostgreSQL", "prometheus": "Prometheus",
+    "grafana": "Grafana", "vscode": "VS Code",
 }
 
 CNCF = {

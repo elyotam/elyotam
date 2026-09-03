@@ -22,10 +22,10 @@
   <img src="assets/icons/git.svg" title="Git" alt="Git" width="48" height="48">
   <img src="assets/icons/github.svg" title="GitHub" alt="GitHub" width="48" height="48">
   <img src="assets/icons/githubactions.svg" title="GitHub Actions" alt="GitHub Actions" width="48" height="48">
-  <img src="assets/icons/nginx.svg" title="NGINX" alt="NGINX" width="48" height="48">
   <img src="assets/icons/postgres.svg" title="PostgreSQL" alt="PostgreSQL" width="48" height="48">
   <img src="assets/icons/prometheus.svg" title="Prometheus" alt="Prometheus" width="48" height="48">
   <img src="assets/icons/grafana.svg" title="Grafana" alt="Grafana" width="48" height="48">
+  <img src="assets/icons/vscode.svg" title="VS Code" alt="VS Code" width="48" height="48">
 </p>
 
 <h3 align="center">🐍 Feeding the snake</h3>
