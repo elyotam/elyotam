@@ -2,7 +2,9 @@
   <img src="assets/banner.svg" alt="Elyotam Cohen" width="100%">
 </p>
 
-<img align="right" src="https://visitor-badge.laobi.icu/badge?page_id=elyotam_profile_visits&left_color=%233776AB&right_color=%23FFD43B" alt="visitors" />
+<div align="right">
+  <img src="https://visitor-badge.laobi.icu/badge?page_id=elyotam_profile_visits&left_color=%233776AB&right_color=%23FFD43B" alt="visitors" />
+</div>
 
 <h3 align="center">🛠️ Tech Stack</h3>
 
