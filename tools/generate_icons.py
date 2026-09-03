@@ -91,9 +91,12 @@ def custom_tile(name):
     dx = (TILE - vw * k) / 2
     dy = (TILE - vh * k) / 2
 
+    # xlink must be declared here: Argo's mark uses <use xlink:href="#a">, and
+    # as a standalone file there is no parent <svg> left to inherit it from.
     return (
-        f'<svg xmlns="http://www.w3.org/2000/svg" width="{TILE}" height="{TILE}" '
-        f'viewBox="0 0 {TILE} {TILE}">'
+        f'<svg xmlns="http://www.w3.org/2000/svg" '
+        f'xmlns:xlink="http://www.w3.org/1999/xlink" '
+        f'width="{TILE}" height="{TILE}" viewBox="0 0 {TILE} {TILE}">'
         f'<rect width="{TILE}" height="{TILE}" rx="{RADIUS}" fill="{style["bg"]}"/>'
         f'<g transform="translate({dx:.2f},{dy:.2f}) scale({k:.5f})">{body}</g>'
         f"</svg>"
