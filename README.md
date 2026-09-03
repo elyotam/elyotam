@@ -40,9 +40,3 @@
     <img alt="A blue snake eating the letters of my name, growing as it goes" src="assets/snake-light.svg" width="100%">
   </picture>
 </p>
-
-<p align="center">
-  <sub>It eats my name and grows a segment fatter every few bites.</sub>
-  <br>
-  <sub><i>Blue on yellow, because Python.</i></sub>
-</p>
