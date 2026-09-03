@@ -54,3 +54,10 @@
     <img alt="A blue snake eating the letters of my name, growing as it goes" src="assets/snake-light.svg" width="100%">
   </picture>
 </p>
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/metrics-dark.svg">
+    <img alt="GitHub metrics" src="assets/metrics-light.svg" width="700">
+  </picture>
+</p>
