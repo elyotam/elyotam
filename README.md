@@ -2,7 +2,6 @@
   <img src="assets/banner.svg" alt="Elyotam Cohen" width="100%">
 </p>
 
-<h1 align="center">Hi, I'm Elyotam Cohen! 👋</h1>
 <img align="right" src="https://visitor-badge.laobi.icu/badge?page_id=elyotam_profile_visits&left_color=%233776AB&right_color=%23FFD43B" alt="visitors" />
 
 <h3 align="center">🛠️ Languages and Tools</h3>
