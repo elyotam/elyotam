@@ -58,22 +58,25 @@ EPS = 0.01        # keyframe percentages must never collide
 
 # ---------------------------------------------------------------- themes ----
 
+# Still the Python palette, just the other way round: a blue snake eating
+# yellow squares. The light theme drops to amber for the squares because bright
+# yellow on a white page is close to invisible.
 THEMES = {
     "dark": {
         "empty": "#161b22",
-        "levels": ["#21445f", "#2b6087", "#3776AB", "#4B8BBE"],
-        "snake_head": "#FFE873",
-        "snake_body": "#FFD43B",
-        "snake_tail": "#D9A404",
-        "flash": "#FFE873",
+        "levels": ["#5c4a12", "#9c7d0d", "#D9A404", "#FFD43B"],
+        "snake_head": "#8FC1E3",
+        "snake_body": "#4B8BBE",
+        "snake_tail": "#2B6087",
+        "flash": "#8FC1E3",
     },
     "light": {
         "empty": "#ebedf0",
-        "levels": ["#cfe3f3", "#8fbde0", "#4B8BBE", "#3776AB"],
-        "snake_head": "#FFD43B",
-        "snake_body": "#F5C211",
-        "snake_tail": "#C9930A",
-        "flash": "#FFE873",
+        "levels": ["#fbeeb8", "#F0CE4E", "#E8B90B", "#C9930A"],
+        "snake_head": "#4B8BBE",
+        "snake_body": "#3776AB",
+        "snake_tail": "#21445F",
+        "flash": "#4B8BBE",
     },
 }
 

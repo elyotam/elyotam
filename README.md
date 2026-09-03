@@ -40,5 +40,5 @@
 <p align="center">
   <sub>It eats my name and grows a segment fatter every few bites.</sub>
   <br>
-  <sub><i>Yellow on blue, because Python.</i></sub>
+  <sub><i>Blue on yellow, because Python.</i></sub>
 </p>
