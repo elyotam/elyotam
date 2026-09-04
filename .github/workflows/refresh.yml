@@ -29,6 +29,11 @@ jobs:
         with:
           python-version: "3.13"
 
+      - name: Note how much the committed panel can see
+        id: before
+        run: |
+          echo "repos=$(grep -oE '[0-9]+ Repositories' assets/metrics-dark.svg             | head -1 | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
+
       - name: Redraw the metrics panel
         env:
           # METRICS_TOKEN is optional: a classic PAT with read:user makes
@@ -42,6 +47,20 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.METRICS_TOKEN || secrets.GITHUB_TOKEN }}
           SNAKE_BOARD: text
         run: python tools/generate_snake.py "${{ github.repository_owner }}" assets
+
+      # The built-in GITHUB_TOKEN only sees public repositories, so without a
+      # METRICS_TOKEN the panel silently loses every private repo. Refuse to
+      # commit a panel that can see less than the one already published.
+      - name: Refuse to publish a narrower view
+        run: |
+          before="${{ steps.before.outputs.repos }}"
+          after=$(grep -oE '[0-9]+ Repositories' assets/metrics-dark.svg             | head -1 | cut -d' ' -f1)
+          echo "repositories visible: was ${before:-?}, now ${after:-?}"
+          if [ -n "$before" ] && [ -n "$after" ] && [ "$after" -lt "$before" ]; then
+            echo "::error::Regenerated panel sees $after repositories, down from           $before. Add a METRICS_TOKEN secret (a PAT with repo + read:user) so           private repositories stay counted. Discarding this run's output."
+            git checkout -- assets
+            exit 1
+          fi
 
       - name: Commit if anything moved
         run: |
