@@ -1,0 +1,56 @@
+name: Refresh profile graphics
+
+on:
+  schedule:
+    # 03:17 UTC daily. A workflow living here cannot see pushes made to other
+    # repositories, so a scheduled run is what keeps the panel current.
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "tools/**"
+      - ".github/workflows/refresh.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-profile
+  cancel-in-progress: true
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Redraw the metrics panel
+        env:
+          # METRICS_TOKEN is optional: a classic PAT with read:user makes
+          # private-repo contributions count. Without it the built-in token
+          # still works, it just sees public activity only.
+          GITHUB_TOKEN: ${{ secrets.METRICS_TOKEN || secrets.GITHUB_TOKEN }}
+        run: python tools/generate_metrics.py "${{ github.repository_owner }}" assets
+
+      - name: Redraw the snake
+        env:
+          GITHUB_TOKEN: ${{ secrets.METRICS_TOKEN || secrets.GITHUB_TOKEN }}
+          SNAKE_BOARD: text
+        run: python tools/generate_snake.py "${{ github.repository_owner }}" assets
+
+      - name: Commit if anything moved
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- assets; then
+            echo "Nothing changed."
+          else
+            git add assets
+            git commit -m "Refresh profile graphics"
+            git push
+          fi

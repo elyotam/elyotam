@@ -273,8 +273,10 @@ def render(u, theme_name, icons):
     height = max(y + 16, y2 + 16)
     c.out.append(f'<line x1="{PAD}" y1="{height - 26}" x2="{W - PAD}" '
                  f'y2="{height - 26}" stroke="{t["rule"]}"/>')
+    # Say when it was built, not that it is live: the panel is a snapshot that
+    # a scheduled job refreshes, so a stale date should be visible as one.
     c.text(W - PAD, height - 10,
-           f"Live from the GitHub API - {datetime.date.today().isoformat()}",
+           f"Generated from the GitHub API on {datetime.date.today().isoformat()}",
            t["dim"], 10, "end")
 
     return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" '
